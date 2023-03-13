@@ -11,7 +11,7 @@
 // const int ledPinNum3 = 27;
 
 #define fanPin 22
-#define lightPin 23 
+#define lightPin 16 
 
 // bool led_sequence [8][3]= { {false, false, false},        
 //                             {false, false, true},
@@ -54,29 +54,40 @@ void setup() {
 void loop() {
   //this check for the internet conectivity status
   if (WiFi.status()== WL_CONNECTED){
+    Serial.println("");
+    Serial.println("");
+    Serial.println("");
+    Serial.println("");
     HTTPClient http;
 
-    String http_response;
-    http.begin(host);                               //starts the connection to the server
+   // Establish a connection to the server
+    String url = "https://" + String(endpoint) + "/api/state";
+    http.begin(url);
+    http.addHeader("Content-type", "application/json");
+    http.addHeader("Content-length", "23");
+    // http.addHeader("X-API-Key", API_KEY);
     
     for (int i = 0; i < 8; i++)
     {
 
-    http.addHeader("Content-Type","application/json"); 
-    http.addHeader("X-API-Key", API_KEY);
+   
 
-    StaticJsonDocument<76> doc;                      //create so we can put thing in this
-    doc["light_switch_1"] = led_sequence[i][0];
-    doc["light_switch_2"] = led_sequence[i][1];
-    doc["light_switch_3"] = led_sequence[i][2];
+    StaticJsonDocument<23> docp;                      //create so we can put thing in this
+    String httpRequestData;
+    // doc["temperature"] = getTemp();
+    // doc["light_switch_1"] = led_sequence[i][0];
+    // doc["light_switch_2"] = led_sequence[i][1];
+    // doc["light_switch_3"] = led_sequence[i][2];
 
-    digitalWrite(ledPinNum1, led_sequence[i][0]);
-    digitalWrite(ledPinNum2, led_sequence[i][1]);
-    digitalWrite(ledPinNum3, led_sequence[i][2]);
+    docp["temperature"] = getTemp();
+
+    // digitalWrite(ledPinNum1, led_sequence[i][0]);
+    // digitalWrite(ledPinNum2, led_sequence[i][1]);
+    // digitalWrite(ledPinNum3, led_sequence[i][2]);
 
 
     String httpRequest; 
-    serializeJson(doc,httpRequest);
+    serializeJson(docp,httpRequest);
     int httpResponseCode = http.PUT(httpRequest);     //This is to do a get request
                                                       //this code return an integer (status code)
                                       
@@ -92,14 +103,51 @@ void loop() {
       Serial.print("Error code:  ");
       Serial.print(httpResponseCode);
     }
-    delay(2000);
+    delay(50);
     }
     
     
     //free resourses
+    http.end();    
+    http.begin(url);
+    httpResponseCode = http.GET();
+
+    Serial.println("");
+    Serial.println("");
+
+    if (httpResponseCode>0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+
+        Serial.print("Response from server: ");
+        http_response = http.getString();
+        Serial.println(http_response);
+      }
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+    }
+ 
+    StaticJsonDocument<1024> docg;
+
+    DeserializationError error = deserializeJson(docg, http_response);
+
+    if (error) {
+      Serial.print("deserializeJson() failed: ");
+      Serial.println(error.c_str());
+      return;
+    }
+    
+    bool temp = docg["fan"]; 
+    bool light= docg["light"]; 
+
+    digitalWrite(fanPin,temp);
+    digitalWrite(lightPin,temp);
+    
+    // Free resources
     http.end();
   }
   else{
-    return;
+     Serial.println("WiFi Disconnected");
   }
 }
