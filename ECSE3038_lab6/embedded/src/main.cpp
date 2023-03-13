@@ -1,24 +1,32 @@
 #include <Arduino.h>
-#include <WiFi.h>
+#include <Wifi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
-#include "env.h"
+#include "env.h" 
 
-const int ledPinNum1 = 25;
-const int ledPinNum2 = 26;
-const int ledPinNum3 = 27;
+#define endpoint "cl-lab6-api.onrender.com"
 
+// const int ledPinNum1 = 25;
+// const int ledPinNum2 = 26;
+// const int ledPinNum3 = 27;
 
-bool led_sequence [8][3]= { {false, false, false},        
-                            {false, false, true},
-                            {false, true,  false},
-                            {false, true,  true},
-                            {true,  false, false},
-                            {true,  false, true},
-                            {true,  true,  false},
-                            {true,  true,  true},
-                           };
+#define fanPin 22
+#define lightPin 23 
 
+// bool led_sequence [8][3]= { {false, false, false},        
+//                             {false, false, true},
+//                             {false, true,  false},
+//                             {false, true,  true},
+//                             {true,  false, false},
+//                             {true,  false, true},
+//                             {true,  true,  false},
+//                             {true,  true,  true},
+//                            };
+
+float getTemp(){
+
+  return random(22.1,33.1);
+}
 
 void setup() {
   // put your setup code here, to run once:
