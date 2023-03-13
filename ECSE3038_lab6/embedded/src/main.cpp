@@ -31,9 +31,12 @@ float getTemp(){
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  pinMode(ledPinNum1, OUTPUT);
-  pinMode(ledPinNum2, OUTPUT);
-  pinMode(ledPinNum3, OUTPUT);
+  // pinMode(ledPinNum1, OUTPUT);
+  // pinMode(ledPinNum2, OUTPUT);
+  // pinMode(ledPinNum3, OUTPUT);
+  pinMode(fanPin,OUTPUT);
+  pinMode(lightPin,OUTPUT);
+
   WiFi.begin(WIFI_SSID, WIFI_PASS); //these should be stored in secret.h and .getignore to hide from public
   
   Serial.println("Connecting");
